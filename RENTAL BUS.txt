@@ -1,0 +1,29 @@
+RENTAL BUS :
+
+bagian yang kurang :
+1. icon bagian frontend
+2. cara menggunakan rupiah
+3. tmpilan frontend ubah warna bila perlu
+4. tabel tarif di index nya tampilkan merk & tipe
+5.trigger database update transaksi
+
+BEGIN
+UPDATE sopir SET status = 'Bebas'
+WHERE id = old.sopir_id;
+UPDATE kendaraan SET status = 'Bebas'
+WHERE id = old.kendaraan_id;
+
+UPDATE sopir SET status = 'Jalan'
+WHERE id = new.sopir_id;
+UPDATE kendaraan SET status = 'Jalan'
+WHERE id = new.kendaraan_id;
+END
+
+BEGIN
+IF New.sopir_id <> Old.sopir_id THEN
+	UPDATE sopir set status = 'Bebas'
+    WHERE id = old.sopir_id;
+    UPDATE sopir set status = 'Jalan'
+    WHERE id = new.sopir_id;
+END IF;
+END

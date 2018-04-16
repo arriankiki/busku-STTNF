@@ -1,0 +1,121 @@
+ADA situs baru yang berguna
+
+demos.krajee.com
+
+untuk trigger
+
+create TRIGGER updateStatus after INSERT ON transaksi
+FOR EACH ROW
+BEGIN
+UPDATE sopir SET status = 'Jalan'
+WHERE id = new.sopir_id;
+UPDATE kendaraan SET status = 'Jalan'
+WHERE id = new.kendaraan_id;
+END
+
+tugas buat trigger
+
+1. pelanggan minta ganti bus
+2. pelanggan membatalkan transaksi
+3. transaksi selesai
+
+create TRIGGER updateStatus2 after UPDATE ON transaksi
+FOR EACH ROW
+BEGIN
+
+
+UPDATE sopir SET status = 'Bebas'
+WHERE id = old.sopir_id;
+UPDATE kendaraan SET status = 'Bebas'
+WHERE id = old.kendaraan_id;
+END
+
+
+untuk buat chart
+
+yii2 highcharts
+
+SELECT tahun, COUNT(tahun) AS jumlah FROM
+kendaraan GROUP BY tahun ORDER BY jumlah DESC
+
+
+
+Pertemuan terakhir
+
+install ekstension di mozila firefox yaitu RESTED CLIENT
+
+
+
+
+controller
+
+public function actionGetSopir()
+    {
+        $client = new Client();
+        $response = $client->createRequest()
+                    ->setFormat(Client::FORMAT_JSON)
+                    ->setMethod('get')
+                    ->setUrl('http://localhost/yii2Advance/administrator/sopir-rest')
+                    /*
+                    ->addHeaders([
+                        'key' => 'a23e919238410e7c80af93851a55405c',
+                    ])
+                    */
+                    ->send();
+        if ($response->isOk) {
+            $content = \Yii\helpers\Json::decode($response->content);
+            /*
+            foreach ($content as $row) {
+                    echo $row['id']." - ".$row['nama']."<br>";
+                }
+            */
+             return $this->render('dataSopir', [
+                'data' => $content,
+            ]);  
+        }else{
+            $content = \Yii\helpers\Json::decode($response->content);
+            echo "Nggak OK";
+        }
+    
+    }
+
+
+
+views/site
+
+<?php
+//konsumsi langsung dari web service 
+$url = "http://localhost/bus/adminku/sopir-rest";
+//Memanggil web service dengan php-curl library
+$ch = curl_init();
+$timeout = 5;
+curl_setopt($ch, CURLOPT_URL, $url);
+curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, $timeout);
+$data = curl_exec($ch);
+curl_close($ch);
+//Data response json didecode dahulu dan menghasilkan sebuh object JSON
+$arr = json_decode($data,true);
+?>
+<h3 align="center">Data Sopir</h3>
+<table align="center" border="3" cellpadding="10">
+<thead>
+        <tr>
+                <th>No</th><th>Nama</th><th>Alamat</th><th>Telepon</th>
+        </tr>
+</thead>
+<tbody>
+        <?php
+        $no = 1;
+        foreach ($arr as $row) {
+        echo '<tr>
+                <td>'.$no.'</td>
+                <td>'.$row['nama'].'</td>
+                <td>'.$row['alamat'].'</td>
+                <td>'.$row['telepon'].'</td>
+        </tr>';
+        $no++;
+        }
+        ?>
+</tbody>
+</table>
